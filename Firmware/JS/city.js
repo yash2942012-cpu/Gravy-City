@@ -1,4 +1,3 @@
-/* GRAVY CITY -- the living city: pedestrians, traffic, characters, fun */
 (function () {
   var GC = (window.GC = window.GC || {});
   var THREE = window.THREE;
@@ -6,8 +5,8 @@
   var ROADS = [];
   for (var rv = -176; rv <= 176; rv += 32) ROADS.push(rv);
   var HALF = 200;
-  var LANE = 8.6;          // sidewalk offset from the road centerline
-  var ASPHALT = 7;         // road half width (painted)
+  var LANE = 8.6; 
+  var ASPHALT = 7;
 
   var scene = null;
   var world = null;
@@ -35,10 +34,6 @@
       return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     };
   }
-
-  /* ==================================================================
-     PEDESTRIANS -- instanced, walk the sidewalks, step aside for you
-     ================================================================== */
   function buildPeds(count) {
     var skins = [0xe0ac69, 0x8d5524, 0xffdbac, 0xc68642, 0x8c5a2b];
     var shirts = [0x8e7dbe, 0xe07a5f, 0x81b29a, 0xf4a261, 0x3d405b, 0x2a9d8f, 0xb56576, 0x4ea8de, 0xe9c46a, 0x6d597a];
@@ -58,12 +53,12 @@
       var side = r() < 0.5 ? -1 : 1;
       var dir = r() < 0.5 ? -1 : 1;
       pedData.push({
-        alongX: alongX,           // walking along the x axis?
+        alongX: alongX,         
         road: road, side: side, dir: dir,
         t: -HALF + 4 + r() * (HALF * 2 - 8),
         speed: 1.1 + r() * 1.3,
         phase: r() * 6.28,
-        off: 0,                   // current sidewalk offset (for dodging)
+        off: 0,              
         shy: 0
       });
       peds.head.setColorAt(i, new THREE.Color(skins[(r() * skins.length) | 0]));
@@ -103,12 +98,10 @@
         x = p.road + p.side * (LANE + p.off); z = p.t;
         ry = p.dir > 0 ? 0 : Math.PI;
       }
-      // dodge the delivery driver
       var dx = x - p0.x, dz = z - p0.z;
       var d2 = dx * dx + dz * dz;
       if (d2 < 9) {
         p.shy = 1;
-        // step toward the road to let the delivery driver pass
         p.off -= dt * 3.2;
         p.off = Math.max(-1.0, Math.min(1.0, p.off));
         p.speed = Math.max(0.35, p.speed - dt * 2.2);
@@ -133,9 +126,6 @@
     for (var k in peds) peds[k].instanceMatrix.needsUpdate = true;
   }
 
-  /* ==================================================================
-     VEHICLES -- drive the grid, brake for you, honk about it
-     ================================================================== */
   function makeCar(color, isPolice) {
     var g = new THREE.Group();
     var bodyMat = mat(color);
@@ -178,7 +168,6 @@
     var r = rng(777);
     for (var i = 0; i < count; i++) {
       var mesh = makeCar(colors[i % colors.length], false);
-      // rectangular loop around one block, driving on the right
       var cx = ROADS[(r() * (ROADS.length - 1)) | 0] + 16;
       var cz = ROADS[(r() * (ROADS.length - 1)) | 0] + 16;
       var off = 3.4;
@@ -206,7 +195,6 @@
     var len = Math.sqrt(dx * dx + dz * dz) || 1;
     var nx = dx / len, nz = dz / len;
     var px = c.mesh.position.x, pz = c.mesh.position.z;
-    // is the player standing in the road ahead?
     var rx = p0.x - px, rz = p0.z - pz;
     var ahead = rx * nx + rz * nz;
     var side = Math.abs(rx * -nz + rz * nx);
@@ -241,9 +229,6 @@
     for (var i = 0; i < cars.length; i++) updateCar(cars[i], dt, t);
   }
 
-  /* ==================================================================
-     CHARACTERS -- people with something to say
-     ================================================================== */
   function addCharacter(opts) {
     var g = GC.makePerson({
       shirt: opts.shirt, pants: opts.pants, skin: opts.skin,
@@ -267,7 +252,6 @@
   }
 
   function buildCharacters() {
-    // 1. the sandwich board guy
     addCharacter({
       name: 'FREE PIZZA GUY', x: 5.5, z: -7.2, shirt: 0x2ec4b6, pants: 0x1d3557, skin: 0xe0ac69,
       facing: -Math.PI / 2, kind: 'pizza',
@@ -279,7 +263,6 @@
       busy: '"One coupon per customer! You already used it! GO AWAY!"',
       effect: function () { if (GC.game && GC.game.giveFreePizza) GC.game.giveFreePizza(); }
     });
-    // 2. the street musician
     addCharacter({
       name: 'BUSKER', x: -8.2, z: 2, shirt: 0x6d597a, pants: 0x3a3a3a, skin: 0xc68642,
       facing: Math.PI / 2, kind: 'music',
@@ -294,7 +277,6 @@
         GC.audio.play('coin');
       }
     });
-    // 3. the security guard
     addCharacter({
       name: 'SECURITY GUARD', x: 24, z: 8.6, shirt: 0x264653, pants: 0x1b263b, skin: 0x8d5524,
       facing: Math.PI, kind: 'guard',
@@ -305,7 +287,6 @@
       ],
       busy: '"I already told you about the dog. GO."'
     });
-    // 4. the dino
     addCharacter({
       name: 'MAN IN DINO SUIT', x: -8.2, z: -28, shirt: 0x3f7a3a, pants: 0x3f7a3a, skin: 0xffdbac,
       facing: Math.PI / 2, kind: 'dino',
@@ -316,7 +297,6 @@
       ],
       busy: '"The dino is thinking. The dino has thoughts. They are slow thoughts."'
     });
-    // 5. the man on the bench
     addCharacter({
       name: 'MAN ON BENCH', x: 6.5, z: 64, shirt: 0x457b9d, pants: 0x22223b, skin: 0xe0ac69,
       facing: -Math.PI / 2, kind: 'bench',
@@ -327,7 +307,6 @@
       ],
       busy: '"Go on. The bench will be here. The bench is always here."'
     });
-    // 6. the skateboard kid
     addCharacter({
       name: 'SKATEBOARD KID', x: 40, z: 4, shirt: 0xf4a261, pants: 0x2a9d8f, skin: 0xffdbac,
       facing: -Math.PI / 2, kind: 'skate',
@@ -390,14 +369,10 @@
     return true;
   }
 
-  /* ==================================================================
-     FUN PROPS -- food trucks, statues, playgrounds, traffic lights
-     ================================================================== */
   function buildFunProps() {
     function solid(x, z, r) {
       if (world && world.circles) world.circles.push({ x: x, z: z, r: r });
     }
-    // food truck
     var truck = new THREE.Group();
     var body = new THREE.Mesh(new THREE.BoxGeometry(2.6, 2.2, 5.4), mat(0xf4a261));
     body.position.y = 1.9; truck.add(body);
@@ -414,7 +389,6 @@
     scene.add(truck);
     solid(-8.4, 14, 2.6);
 
-    // hot dog cart
     var cart = new THREE.Group();
     var cbody = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.0, 2.2), mat(0xc1121f));
     cbody.position.y = 1.3; cart.add(cbody);
@@ -428,7 +402,6 @@
     scene.add(cart);
     solid(9.2, 36, 1.3);
 
-    // the statue of a man who won a pizza contest
     var statue = new THREE.Group();
     var plinth = new THREE.Mesh(new THREE.BoxGeometry(2.2, 1.2, 2.2), mat(0x8f949b));
     plinth.position.y = 0.6; statue.add(plinth);
@@ -445,7 +418,6 @@
     scene.add(statue);
     solid(-3, 66, 1.4);
 
-    // playground in the park
     var slide = new THREE.Group();
     var plat = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.3, 2.4), mat(0xe76f51));
     plat.position.y = 2.0; slide.add(plat);
@@ -474,7 +446,6 @@
     scene.add(swing);
     solid(-6, 62, 1.4);
 
-    // traffic lights at the big intersections
     var spots = [[16, 16], [-16, 16], [16, -16], [-16, -16], [48, 48], [-48, -48],
                  [112, 112], [-112, -112], [112, -112], [-112, 112]];
     for (var i = 0; i < spots.length; i++) {
@@ -505,7 +476,6 @@
       trafficLights.push(tl);
     }
 
-    // trash bags by the bins
     var r = rng(99);
     for (var b = 0; b < 14; b++) {
       var a = r() * Math.PI * 2;
@@ -516,8 +486,6 @@
       bag.castShadow = true;
       scene.add(bag);
     }
-
-    // the sandwich board: FREE PIZZA (it is not free)
     var board = new THREE.Group();
     var bpanel = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.6, 0.12), mat(0x1b1e24));
     bpanel.position.y = 1.1; board.add(bpanel);
@@ -550,14 +518,10 @@
   }
   var trafficLights = [];
 
-  /* ==================================================================
-     POLICE -- after enough wrong doors, they find you
-     ================================================================== */
   function startPolice() {
     if (police) return;
     var mesh = makeCar(0x1b3a6b, true);
     var p0 = GC.player.state.pos;
-    // pull in from the nearest street so the arrival looks legal
     var rx = nearestRoadValue(p0.x), rz = nearestRoadValue(p0.z);
     mesh.position.set(rx + 3.4, 0, rz + 3.4);
     scene.add(mesh);
@@ -568,7 +532,6 @@
     }
   }
 
-  /* nearest road centerline value to v */
   function nearestRoadValue(v) {
     var best = ROADS[0], bd = 1e9;
     for (var i = 0; i < ROADS.length; i++) {
@@ -577,11 +540,9 @@
     }
     return best;
   }
-
-  /* does a straight line from (x1,z1) to (x2,z2) hit any building? */
   function segmentClear(x1, z1, x2, z2) {
     if (!world || !world.colliders) return true;
-    var INSET = 0.8;            // doorways sit on the wall, so shave the boxes
+    var INSET = 0.8;         
     var dx = x2 - x1, dz = z2 - z1;
     for (var i = 0; i < world.colliders.length; i++) {
       var c = world.colliders[i];
@@ -607,26 +568,24 @@
           if (t0 > t1) ok = false;
         }
       }
-      if (ok) return false;   // it hits something
+      if (ok) return false;  
     }
     return true;
   }
 
-  /* build a street route for the cruiser: intersections, then the player */
   function policeRoute(p0, m) {
     var mx = nearestRoadValue(m.position.x), mz = nearestRoadValue(m.position.z);
     var px = nearestRoadValue(p0.x), pz = nearestRoadValue(p0.z);
     var route = [];
     if (Math.abs(m.position.x - mx) > 1.2 || Math.abs(m.position.z - mz) > 1.2) {
-      route.push({ x: mx, z: mz });              // pull onto the intersection
+      route.push({ x: mx, z: mz });          
     }
-    var viaX = { x: px, z: mz };                // drive along the east-west street
-    var viaZ = { x: mx, z: pz };                // drive along the north-south street
+    var viaX = { x: px, z: mz };             
+    var viaZ = { x: mx, z: pz };       
     var xOk = segmentClear(m.position.x, m.position.z, viaX.x, viaX.z);
     var zOk = segmentClear(m.position.x, m.position.z, viaZ.x, viaZ.z);
     route.push(xOk || !zOk ? viaX : viaZ);
-    route.push({ x: px, z: pz });                // the player's intersection
-    // then pull up to the kerb nearest the player
+    route.push({ x: px, z: pz });     
     var kerbX = { x: px, z: p0.z }, kerbZ = { x: p0.x, z: pz };
     route.push(Math.abs(p0.x - px) < Math.abs(p0.z - pz) ? kerbX : kerbZ);
     return route;
@@ -642,12 +601,11 @@
     var mvx = 0, mvz = 0;
     if (direct) {
       var spd = d > 9 ? 14 : 3.5;
-      if (d > 3.2) {                       // pull up and park, do not drive through the wall
+      if (d > 3.2) {                
         mvx = dx / d * spd * dt;
         mvz = dz / d * spd * dt;
       }
     } else {
-      // follow the street route, one axis at a time
       if (!police.route || !police.routeTarget ||
           Math.abs(p0.x - police.routeTarget.x) > 3 || Math.abs(p0.z - police.routeTarget.z) > 3) {
         police.route = policeRoute(p0, m);
@@ -701,9 +659,6 @@
     }
   }
 
-  /* ==================================================================
-     PUBLIC API
-     ================================================================== */
   GC.city = {
     colliders: [],
     honks: 0,
