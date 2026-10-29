@@ -1,4 +1,3 @@
-/* GRAVY CITY -- procedural audio (no external files) */
 (function () {
   var GC = (window.GC = window.GC || {});
 
@@ -127,7 +126,6 @@
         tone({ type: 'sawtooth', f: notes[i], dur: 0.16, vol: 0.16, filter: 'lowpass', cutoff: 2600, delay: i * 0.17 });
       }
     },
-    /* the classic 4-note wah-wah failure */
     trombone: function () {
       var seq = [[196, 0.55], [164.81, 0.5], [130.81, 0.5], [116.54, 0.85]];
       var time = 0;
@@ -148,7 +146,6 @@
         lfo.connect(lfoGain); lfoGain.connect(flt.frequency);
         var g = ctx.createGain();
         g.gain.setValueAtTime(0.0001, t0() + time);
-        // two wah bumps per note
         g.gain.linearRampToValueAtTime(0.26, t0() + time + 0.14);
         g.gain.linearRampToValueAtTime(0.08, t0() + time + 0.26);
         g.gain.linearRampToValueAtTime(0.24, t0() + time + 0.36);
@@ -159,14 +156,11 @@
         time += d;
       }
     },
-    /* clock tick for the last 10 seconds */
     tick: function () { tone({ type: 'square', f: 1500, dur: 0.05, vol: 0.14 }); },
-    /* angry car horn */
     horn: function () {
       tone({ type: 'square', f: 392, dur: 0.32, vol: 0.13 });
       tone({ type: 'square', f: 523, dur: 0.32, vol: 0.11 });
     },
-    /* police wail */
     siren: function () {
       tone({ type: 'sawtooth', f: 620, f2: 980, dur: 0.55, vol: 0.12, filter: 'lowpass', cutoff: 2200 });
       tone({ type: 'sawtooth', f: 980, f2: 620, dur: 0.55, vol: 0.12, filter: 'lowpass', cutoff: 2200, delay: 0.55 });
