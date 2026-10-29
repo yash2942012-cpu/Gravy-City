@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRAVY CITY PIZZA: DO NOT LATE</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <canvas id="scene"></canvas>
+
+  <!-- ============ HUD ============ -->
+  <div id="hud" class="hidden">
+    <div id="hud-left">
+      <div class="stat"><span class="lbl">TIPS</span><span class="val" id="stat-tips">$0</span></div>
+        <div class="stat"><span class="lbl">PIZZAS</span><span class="val" id="stat-pizzas">0/10</span></div>
+        <div class="stat"><span class="lbl">SHIFT</span><span class="val" id="stat-time">7:30</span></div>
+      <div id="stat-target">TARGET: <b id="stat-target-name">---</b></div>
+      <div id="stat-address" class="dim">---</div>
+    </div>
+
+    <div id="ticker-wrap"><div id="ticker"></div></div>
+
+    <div id="compass"><div id="compass-arrow">&#9650;</div><div id="compass-label">TARGET</div></div>
+
+    <div id="minimap-wrap">
+      <canvas id="minimap" width="230" height="230"></canvas>
+       <div class="mini-label">GREATER GRAVY CITY</div>
+    </div>
+
+    <div id="carry-wrap">
+      <div id="carry"></div>
+      <div id="prompt"></div>
+    </div>
+
+    <div id="crosshair"></div>
+
+    <div id="phone-icon" class="hidden">&#128222;<span id="phone-ring">RINGING</span></div>
+    <div id="vignette"></div>
+    <div id="flash"></div>
+    <div id="toast"></div>
+  </div>
+
+  <!-- ============ Fake ad popup (annoyance) ============ -->
+  <div id="ad" class="hidden">
+    <div id="ad-head">ADVERTISEMENT</div>
+    <div id="ad-body">
+      <div id="ad-title">&#127827; YOU WON A FREE PIZZA!</div>
+      <div id="ad-sub">Click to claim your prize. (You did not.)</div>
+      <button id="ad-claim">CLAIM MY FREE PIZZA</button>
+      <button id="ad-close">X</button>
+    </div>
+    <div id="ad-scan" class="hidden">
+      <div id="ad-scan-text">SCANNING YOUR DELIVERY LICENSE...</div>
+      <div id="ad-scan-bar"><div id="ad-scan-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ============ Dialogue (mom / customers) ============ -->
+  <div id="dialog" class="hidden">
+    <div id="dialog-name">DISPATCH</div>
+    <div id="dialog-text"></div>
+  </div>
+
+  <!-- ============ Title screen ============ -->
+  <div id="menu">
+    <div id="menu-inner">
+      <div id="logo">
+        <div class="logo-top">GRAVY CITY</div>
+        <div class="logo-main">PIZZA</div>
+        <div class="logo-sub">DO NOT LATE</div>
+      </div>
+      <div id="pitch">
+        <p><b>You are the last delivery driver on the night shift.</b></p>
+        <p>Deliver <b>10 pizzas</b> to <b>10 doors</b> across the <b>Greater Gravy City</b> mega-map before your shift ends.<br>
+           Hot pizzas make happy customers. Cold pizzas make <i>stories</i>.</p>
+        <p class="warn">&#9888; Gravy City is a hostile delivery environment. Pigeons. Grease. Traffic. Your mother.</p>
+      </div>
+      <div id="controls">
+        <div class="ck"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd><span>Move</span></div>
+        <div class="ck"><kbd>Mouse</kbd><span>Look</span></div>
+        <div class="ck"><kbd>Shift</kbd><span>Sprint (risky!)</span></div>
+        <div class="ck"><kbd>E</kbd><span>Take / Deliver / Answer</span></div>
+        <div class="ck"><kbd>Esc</kbd><span>Pause</span></div>
+      </div>
+      <button id="play-btn">START THE SHIFT</button>
+      <div id="menu-foot">click to lock the mouse &middot; headphones recommended &middot; no pizza was harmed</div>
+    </div>
+  </div>
+
+  <!-- ============ Pause ============ -->
+  <div id="pause" class="hidden">
+    <div id="pause-inner">
+      <h1>SHIFT PAUSED</h1>
+      <p>The pigeons are waiting. They are very patient.</p>
+      <button id="resume-btn">RESUME</button>
+    </div>
+  </div>
+
+  <!-- ============ Results ============ -->
+  <div id="results" class="hidden">
+    <div id="results-inner">
+      <h1 id="results-title">SHIFT OVER</h1>
+      <div id="results-grade">GRADE: ?</div>
+      <div id="results-stats"></div>
+      <div id="results-quip"></div>
+      <button id="again-btn">DO IT AGAIN</button>
+    </div>
+  </div>
+
+  <div id="loading">BUILDING GRAVY CITY...</div>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/world.js"></script>
+<script src="js/city.js"></script>
+<script src="js/player.js"></script>
+<script src="js/annoyances.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
