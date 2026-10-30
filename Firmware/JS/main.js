@@ -1,4 +1,3 @@
-/* GRAVY CITY PIZZA: DO NOT LATE -- main game */
 (function () {
   var GC = (window.GC = window.GC || {});
   var THREE = window.THREE;
@@ -7,9 +6,9 @@
   var game = null;
   var world = null;
 
-  var SHIFT = 450;             // seconds on shift
+  var SHIFT = 450;         
   var MAX_CARRY = 3;
-  var PIZZA_COOL_RATE = 1 / 100; // heat lost per second
+  var PIZZA_COOL_RATE = 1 / 100;
   var SPAWN = { x: 0, z: -8.5 };
 
   var CUSTOMER_LINES = [
@@ -102,7 +101,6 @@
     scene.add(sun);
     scene.add(sun.target);
 
-    // a moon, because Gravy City deserves one
     var moon = new THREE.Mesh(
       new THREE.SphereGeometry(6, 16, 12),
       new THREE.MeshBasicMaterial({ color: 0xfff3c4 })
@@ -121,7 +119,6 @@
     renderer.setSize(window.innerWidth, window.innerHeight, false);
   }
 
-  /* ------------------------------------------------------------------ */
   function startGame() {
     var doors = world.doors;
     var orders = doors.slice();
@@ -176,7 +173,7 @@
         var p = c.requestPointerLock();
         if (p && p.catch) p.catch(function () { });
       }
-    } catch (e) { /* pointer lock is optional */ }
+    } catch (e) {}
   }
 
   function currentTargetEntry() {
@@ -201,7 +198,6 @@
     return opts[(Math.random() * opts.length) | 0];
   }
 
-  /* ---------------- interactions ---------------- */
   function nearestDoor() {
     var p = GC.player.state.pos;
     var best = null, bd = 3.2;
@@ -244,7 +240,6 @@
     GC.ui.setCarry(game.carry);
     GC.audio.play('coin');
     GC.ui.say('DISPATCH: Order for ' + pizza.entry.address + '. It is HOT. Move.');
-    // the resident comes out to wait for their pizza
     pizza.entry.customerShown = true;
     refreshTarget();
   }
@@ -293,7 +288,6 @@
       GC.ui.toast('+' + tip + '$  HOT PIZZA!');
       sayCustomer(CUSTOMER_LINES, entry, tip);
     }
-    // the resident appears to collect their shame
     entry.customerShown = true;
     entry.customerT = 0;
     refreshTarget();
@@ -341,7 +335,6 @@
       });
       return;
     }
-    // a neighbour with something to say
     var person = GC.city.nearestCharacter(GC.player.state.pos, 2.8);
     if (person) {
       GC.city.talkTo(person);
@@ -376,7 +369,6 @@
     GC.audio.play('coin');
   }
 
-  /* ---------------- events from the annoyance engine ---------------- */
   function onPigeonAttack() {
     if (game.carry.length) {
       var idx = (Math.random() * game.carry.length) | 0;
@@ -409,7 +401,6 @@
     m.add(box);
     var lid = new THREE.Mesh(new THREE.BoxGeometry(0.64, 0.04, 0.64), new THREE.MeshLambertMaterial({ color: 0xefc15c }));
     lid.position.y = 0.09; m.add(lid);
-    // never drop the pizza inside a wall -- find open ground
     var px = GC.player.state.pos.x, pz = GC.player.state.pos.z;
     var x = px, z = pz;
     for (var tries = 0; tries < 12; tries++) {
@@ -500,7 +491,6 @@
     GC.ui.setCarry(game.carry);
   }
 
-  /* ---------------- end of shift ---------------- */
   function endGame(reason) {
     if (game.state === 'ended') return;
     game.state = 'ended';
@@ -545,7 +535,6 @@
     if (document.exitPointerLock) document.exitPointerLock();
   }
 
-  /* ---------------- main loop ---------------- */
   var last = 0;
   function loop(now) {
     requestAnimationFrame(loop);
@@ -563,7 +552,6 @@
         GC.ui.say('DISPATCH: That is every order. Go home. ...Take the scooter.', true);
         endGame('done');
       }
-      // pizzas cool down
       radioChatter(dt);
       var worst = 0;
       for (var i = 0; i < game.carry.length; i++) {
@@ -619,7 +607,6 @@
     }
 
     if (game.state === 'playing') {
-      // context prompt
       var prompt = '';
       var who = GC.city.nearestCharacter(GC.player.state.pos, 2.8);
       if (GC.annoyances.phoneRinging) prompt = '<kbd>E</kbd> Answer Mom';
@@ -641,7 +628,6 @@
     renderer.render(scene, camera);
   }
 
-  /* ---------------- boot ---------------- */
   function boot() {
     setup();
     GC.ui.init();
@@ -708,7 +694,6 @@
     document.getElementById('resume-btn').addEventListener('click', function () { game.resume(); });
     document.getElementById('again-btn').addEventListener('click', function () { game.restart(); });
 
-    // if the browser refused the mouse (or the fake ad stole it), click to grab it back
     document.getElementById('scene').addEventListener('mousedown', function () {
       if (game.state === 'playing' && !document.pointerLockElement && !(GC.ui && GC.ui.isModalOpen())) requestLock();
     });
