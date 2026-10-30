@@ -1,4 +1,3 @@
-/* GRAVY CITY -- HUD, minimap, ticker, overlays, fake ads */
 (function () {
   var GC = (window.GC = window.GC || {});
   var THREE = window.THREE;
@@ -58,8 +57,6 @@
       GC.ui.say('That X button is decorative.', true);
     });
   }
-
-  /* ---------------- ticker / toast ---------------- */
   var tickerTimer = null;
   function say(text, pop) {
     el.ticker.innerHTML = text;
@@ -83,7 +80,6 @@
     setTimeout(function () { el.flash.style.opacity = 0; }, 90);
   }
 
-  /* ---------------- fake ad ---------------- */
   function onAdClaim() {
     if (adScanning) return;
     adScanning = true;
@@ -121,7 +117,6 @@
     el.adClaim.textContent = 'CLAIM MY FREE PIZZA';
     el.adScan.classList.add('hidden');
     el.adScanFill.style.width = '0%';
-    // the ad grabs your mouse. this is the whole point.
     if (document.pointerLockElement && document.exitPointerLock) {
       try { document.exitPointerLock(); } catch (e) { }
     }
@@ -133,15 +128,11 @@
     modalOpen = false;
     if (adScanTimer) { clearInterval(adScanTimer); adScanTimer = null; }
     el.ad.classList.add('hidden');
-    // take the mouse back
     if (GC.game && GC.game.state === 'playing' && GC.game.requestLock) GC.game.requestLock();
   }
-
-  /* ---------------- phone ---------------- */
   function showPhone() { el.phone.classList.remove('hidden'); }
   function hidePhone() { el.phone.classList.add('hidden'); }
 
-  /* ---------------- dialogue ---------------- */
   function dialog(name, lines, done) {
     dialogQueue = lines.slice();
     dialogDone = done || null;
@@ -174,8 +165,7 @@
     el.dialog.classList.add('hidden');
   }
 
-  /* ---------------- minimap ---------------- */
-  var MINI_SIZE = 230, MINI_RANGE = 420; // world units across
+  var MINI_SIZE = 230, MINI_RANGE = 420;
   function drawMinimap(t) {
     if (!miniCtx) return;
     var g = miniCtx;
@@ -188,7 +178,6 @@
     g.fillStyle = '#14171c';
     g.fillRect(0, 0, MINI_SIZE, MINI_SIZE);
 
-    // roads
     g.fillStyle = '#2b3038';
     var roads = (worldData && worldData.roads) || [-48, -16, 16, 48];
     for (var i = 0; i < roads.length; i++) {
@@ -196,7 +185,6 @@
       g.fillRect(tx(roads[i]) - rw / 2, 0, rw, MINI_SIZE);
       g.fillRect(0, tz(roads[i]) - rw / 2, MINI_SIZE, rw);
     }
-    // buildings
     if (worldData) {
       g.fillStyle = '#59606b';
       for (var c = 0; c < worldData.colliders.length; c++) {
@@ -204,7 +192,6 @@
         g.fillRect(tx(b.minX), tz(b.minZ), (b.maxX - b.minX) * scale, (b.maxZ - b.minZ) * scale);
       }
     }
-    // the parks
     if (worldData) {
       var parks = worldData.parks || (worldData.park ? [worldData.park] : []);
       g.fillStyle = '#3f7a3a';
@@ -212,7 +199,6 @@
         g.fillRect(tx(parks[pk][0] - 9), tz(parks[pk][1] - 9), 18 * scale, 18 * scale);
       }
     }
-    // restaurant
     if (worldData && worldData.restaurant) {
       var rr = worldData.restaurant;
       g.fillStyle = '#c1121f';
@@ -221,7 +207,6 @@
       g.font = 'bold 8px monospace';
       g.fillText('PIZZA', tx(rr.x - 3), tz(rr.z + 1.5));
     }
-    // grease slicks
     var puddles = GC.annoyances.puddles;
     if (puddles) {
       g.fillStyle = 'rgba(10,10,14,0.85)';
@@ -231,7 +216,6 @@
         g.fill();
       }
     }
-    // target
     var tgt = GC.annoyances.gpsFake || GC.game.currentTarget;
     if (tgt) {
       var px = tx(tgt.x), pz = tz(tgt.z);
@@ -247,7 +231,6 @@
       g.moveTo(px, pz - 7); g.lineTo(px, pz + 7);
       g.stroke();
     }
-    // player
     var ppx = MINI_SIZE / 2, ppz = MINI_SIZE / 2;
     g.save();
     g.translate(ppx, ppz);
@@ -257,7 +240,6 @@
     g.moveTo(0, -6); g.lineTo(4.5, 5); g.lineTo(0, 2.5); g.lineTo(-4.5, 5);
     g.closePath(); g.fill();
     g.restore();
-    // frame
     g.strokeStyle = '#3d5a80';
     g.lineWidth = 2;
     g.strokeRect(1, 1, MINI_SIZE - 2, MINI_SIZE - 2);
@@ -266,7 +248,6 @@
     g.fillText('N', MINI_SIZE / 2 - 3, 11);
   }
 
-  /* ---------------- results ---------------- */
   function showResults(data) {
     el.resultsTitle.textContent = data.title || 'SHIFT OVER';
     el.resultsGrade.textContent = 'GRADE: ' + data.grade;
@@ -324,7 +305,6 @@
     },
     update: function (dt, t) {
       drawMinimap(t);
-      // compass toward the current target
       var tgt = GC.annoyances.gpsFake || GC.game.currentTarget;
       if (el.compassArrow) {
         if (tgt) {
