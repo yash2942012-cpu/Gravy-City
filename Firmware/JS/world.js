@@ -1,9 +1,8 @@
-/* GRAVY CITY -- city generation, buildings, doors, props, collision */
 (function () {
   var GC = (window.GC = window.GC || {});
   var THREE = window.THREE;
 
-  var WORLD = 400;              // world spans -200..200
+  var WORLD = 400;             
   var HALF = WORLD / 2;
   var ROADS = [];
   for (var rv = -176; rv <= 176; rv += 32) ROADS.push(rv);
@@ -11,15 +10,14 @@
   for (var bx = -160; bx <= 160; bx += 32) {
     for (var bz = -160; bz <= 160; bz += 32) BLOCK_CENTERS.push([bx, bz]);
   }
-  var PARK = [0, 160];          // big green space up north
-  var POCKET_PARK = [0, 64];    // the old playground block, now a pocket park
+  var PARK = [0, 160];     
+  var POCKET_PARK = [0, 64];  
 
   function isParkBlock(bx, bz) {
     return (bx === PARK[0] && bz === PARK[1]) || (bx === POCKET_PARK[0] && bz === POCKET_PARK[1]);
   }
 
   var BLD = [
-    /* ---- delivery targets ---- */
     { x: 32, z: 32, w: 14, d: 12, h: 14, side: 'n', num: '88', name: 'SNEAR CORNER LIQUOR', street: 'PASTA AVE', apt: '', color: 0x2a9d8f },
     { x: -32, z: 32, w: 13, d: 12, h: 10, side: 'n', num: '90', name: "NUN'S BAIL OUT LOANS", street: 'PASTA AVE', apt: '', color: 0xe9c46a },
     { x: 32, z: 0, w: 13, d: 13, h: 18, side: 'w', num: '22', name: 'TALL ORDER LAW', street: 'DOUGH BLVD', apt: 'APT 12F', color: 0x264653 },
@@ -30,9 +28,7 @@
     { x: 64, z: 32, w: 13, d: 12, h: 12, side: 'w', num: '55', name: 'THE NOODLE FACTORY', street: 'SAUCE STREET', apt: '', color: 0xe76f51 },
     { x: -64, z: -64, w: 14, d: 12, h: 15, side: 'n', num: '12', name: 'THE GHOST OF FLAT 3A', street: 'TOPPING TERRACE', apt: 'APT 3A', color: 0x588157 },
     { x: 64, z: -64, w: 13, d: 12, h: 10, side: 'e', num: '3', name: 'DIRE STRAIGHT PIZZA', street: 'GRAVY BOULEVARD', apt: '', color: 0xbc6c25 },
-    /* ---- the pizza palace ---- */
     { x: 0, z: 0, w: 14, d: 11, h: 7.0, side: 'n', num: '1', name: 'GRAVY CITY SLICE', street: 'BREAD LANE', apt: '', color: 0xc1121f, restaurant: true },
-    /* ---- filler: scenery that is definitely not your order ---- */
     { x: -32, z: -64, w: 13, d: 12, h: 9, name: 'MOONLIGHT MOTEL', color: 0x6d597a, plain: true },
     { x: 0, z: -64, w: 14, d: 12, h: 16, name: 'PARKING ENFORCEMENT HQ', color: 0x457b9d, plain: true },
     { x: 32, z: -64, w: 13, d: 12, h: 7, name: 'TIN FOIL RESTAURANT', color: 0x8d99ae, plain: true },
@@ -45,7 +41,6 @@
     { x: -32, z: 64, w: 13, d: 12, h: 18, name: 'CLOCK TOWER OF DOOM', color: 0x264653, plain: true },
     { x: 32, z: 64, w: 13, d: 12, h: 9, name: 'CHEESE WAREHOUSE', color: 0xe9c46a, plain: true },
     { x: 64, z: 64, w: 14, d: 12, h: 12, name: 'THE LAST BATHHOUSE', color: 0x6d597a, plain: true },
-    /* ---- the outer city: everything from here out is scenery, but it is a lot of it ---- */
     { x: -160, z: -160, w: 14, d: 12, h: 22, name: 'TOWER OF NO RETURN', color: 0x264653, plain: true },
     { x: -128, z: -160, w: 13, d: 12, h: 11, name: 'AUTO BODY & SOUP', color: 0x6d597a, plain: true },
     { x: -96, z: -160, w: 13, d: 12, h: 16, name: 'WIRELESS TELEGRAPHY MUSEUM', color: 0x457b9d, plain: true },
@@ -87,7 +82,6 @@
     { x: 96, z: -160, w: 13, d: 12, h: 12, name: 'GREASE MONKEYS', color: 0xbc6c25, plain: true },
     { x: 160, z: -160, w: 14, d: 12, h: 20, name: 'OBSIDIAN TOWER', color: 0x1b2230, plain: true },
     { x: 64, z: -160, w: 13, d: 12, h: 10, name: 'THE LAST GAS STATION', color: 0xc1121f, plain: true },
-    /* ---- the rest of the grid: infill so the city does not look like one big car park ---- */
     { x: -32, z: -160, w: 13, d: 12, h: 9, name: 'DEAD END DELI', color: 0xe76f51, plain: true },
     { x: 0, z: -160, w: 13, d: 12, h: 7, name: 'MUNICIPAL POOL (CLOSED)', color: 0x457b9d, plain: true },
     { x: 32, z: -160, w: 13, d: 12, h: 15, name: 'PAWNEE TOWERS', color: 0x6d597a, plain: true },
@@ -145,7 +139,6 @@
     return m;
   }
 
-  /* ---------------- instancing helper ---------------- */
   var batches = {};
   function push(name, geo, material, x, y, z, ry, sx, sy, sz, rx) {
     var b = batches[name];
@@ -178,7 +171,6 @@
     batches = {};
   }
 
-  /* ---------------- texture helpers ---------------- */
   function facadeTexture(colorHex, seed) {
     var r = rng(seed);
     var c = document.createElement('canvas');
@@ -327,7 +319,6 @@
       g.strokeStyle = '#33373d'; g.lineWidth = 2;
       g.beginPath(); g.arc(hx, hy, 4, 0, Math.PI * 2); g.stroke();
     }
-    // the city limits, marked with a line of cones
     g.fillStyle = 'rgba(255,107,53,0.5)';
     for (var e = -HALF + 4; e < HALF - 2; e += 6) {
       g.fillRect(wx(e), wz(-HALF + 2), 2.4, 2.4);
@@ -339,8 +330,6 @@
     tex.anisotropy = 8;
     return tex;
   }
-
-  /* ---------------- person ---------------- */
   function makePerson(opts) {
     opts = opts || {};
     var g = new THREE.Group();
@@ -378,10 +367,9 @@
   }
   GC.makePerson = makePerson;
 
-  /* ---------------- world state ---------------- */
-  var colliders = [];      // {minX,maxX,minZ,maxZ,h}
-  var circles = [];        // {x,z,r}
-  var doors = [];          // delivery targets
+  var colliders = [];   
+  var circles = [];       
+  var doors = [];         
   var props = [];
   var scene, restaurant = null, marker = null;
   var customers = null, customerIndex = 0;
@@ -404,7 +392,6 @@
     mesh.receiveShadow = true;
     scene.add(mesh);
 
-    // skyline gets bigger
     var rs = rng(7);
     var items = [];
     for (var i = 0; i < 96; i++) {
@@ -462,9 +449,7 @@
     mesh.castShadow = true; mesh.receiveShadow = true;
     scene.add(mesh);
 
-    // roof lip
     addBox(spec.w + 0.5, 0.5, spec.d + 0.5, 0x2b2f36, spec.x, spec.h + 0.2, spec.z, { shadow: false });
-    // rooftop clutter (instanced, unit box scaled per item)
     var r = rng(500 + index);
     var unitBox = geo('unitBox', function () { return new THREE.BoxGeometry(1, 1, 1); });
     var unitCyl = geo('unitCyl', function () { return new THREE.CylinderGeometry(0.5, 0.5, 1, 10); });
@@ -499,7 +484,6 @@
     doorGroup.add(frame);
 
     if (spec.plain) {
-      // a shop with the roller already down: you are not delivering here
       var shutTex = shutterTexture();
       shutTex.repeat.set(1.6, 1.2);
       var shutter = new THREE.Mesh(new THREE.PlaneGeometry(2.0, 2.6), new THREE.MeshLambertMaterial({ map: shutTex }));
@@ -558,7 +542,6 @@
     return entry;
   }
 
-  /* ---------------- instanced residents waiting for pizza ---------------- */
   function buildCustomerPool(count) {
     customers = {
       body: new THREE.InstancedMesh(new THREE.BoxGeometry(0.62, 0.72, 0.36), mat(0xffffff), count),
@@ -634,7 +617,6 @@
     for (var k in customers) customers[k].instanceMatrix.needsUpdate = true;
   }
 
-  /* ---------------- instanced props ---------------- */
   var GEO = {}, MAT = {};
   function geo(key, make) { if (!GEO[key]) GEO[key] = make(); return GEO[key]; }
   function mtl(key, color, extra) { if (!MAT[key]) MAT[key] = mat(color, extra); return MAT[key]; }
@@ -756,7 +738,6 @@
       return false;
     }
 
-    // the park: one green block, fully furnished
     fountain(PARK[0] - 3, PARK[1] + 2);
     tree(PARK[0] - 6.5, PARK[1] - 5, 1.05);
     tree(PARK[0] + 5.5, PARK[1] - 4, 0.9);
@@ -766,7 +747,6 @@
     bench(PARK[0] + 3, PARK[1] - 5.5, Math.PI / 2);
     bench(PARK[0] + 5, PARK[1] + 2, Math.PI);
 
-    // street lamps: both sides of every road
     for (var ri = 0; ri < ROADS.length; ri++) {
       var rv = ROADS[ri];
       for (var p = -176; p <= 176; p += 24) {
@@ -777,7 +757,6 @@
       }
     }
 
-    // trees lining the boulevards
     for (var ti = 0; ti < BLOCK_CENTERS.length; ti++) {
       var bc = BLOCK_CENTERS[ti];
       if (bc[0] === PARK[0] && bc[1] === PARK[1]) continue;
@@ -785,7 +764,6 @@
       tree(bc[0] + 8.4, bc[1] + 8.4, 0.7 + r() * 0.3);
     }
 
-    // scattered street furniture
     var placed = 0, guard = 0;
     while (placed < 190 && guard < 2200) {
       guard++;
@@ -801,8 +779,6 @@
       else bike(x, z, r() * 6.28);
       placed++;
     }
-
-    // a few landmarks with personality
     phoneBooth(-8.6, 12, Math.PI / 2);
     phoneBooth(42, -8.6, 0);
     phoneBooth(-8.6, -46, Math.PI / 2);
@@ -852,12 +828,10 @@
     scene.add(psign);
     props.push({ type: 'spin', mesh: psign });
 
-    // counter window + stack of boxes
     addBox(3.2, 1.6, 0.4, 0x2b2b2b, -5.4, 1.4, -5.7, { shadow: false });
     for (var b = 0; b < 4; b++) {
       addBox(1.1, 0.16, 1.1, 0xc9a227, -5.4, 0.9 + b * 0.17, -6.4, { shadow: false });
     }
-    // the scooter that is not yours
     var sc = new THREE.Group();
     sc.position.set(7.6, 0, -7.2);
     sc.rotation.y = 0.5;
@@ -914,7 +888,6 @@
       marker.position.set(entry.x + entry.nx * 1.6, 0, entry.z + entry.nz * 1.6);
     },
     reset: function () {
-      // everyone goes back inside for the new shift
       for (var i = 0; i < doors.length; i++) {
         doors[i].customerShown = false;
         doors[i].customerT = 0;
