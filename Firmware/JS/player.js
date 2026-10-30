@@ -1,4 +1,3 @@
-/* GRAVY CITY -- player controller, third person camera, collision */
 (function () {
   var GC = (window.GC = window.GC || {});
   var THREE = window.THREE;
@@ -51,13 +50,10 @@
       if (lockLostTimer) { clearTimeout(lockLostTimer); lockLostTimer = null; }
       return;
     }
-    // the browser fires a null lock event while a request is still pending, so wait
-    // a moment and only treat it as a real release if the mouse stays free
     if (lockLostTimer) clearTimeout(lockLostTimer);
     lockLostTimer = setTimeout(function () {
       lockLostTimer = null;
       if (locked) return;
-      // a modal (the fake ad) deliberately drops the mouse -- do not pause for that
       if (GC.game && GC.game.state === 'playing' && !(GC.ui && GC.ui.isModalOpen())) GC.game.pause('pointer-lock-lost');
     }, 300);
   }
@@ -127,7 +123,6 @@
   }
 
   function cameraBlocked(dist, yaw, pitch) {
-    // does the camera boom hit a building?
     var h = 2.2;
     var cp = Math.cos(pitch);
     var dirX = Math.sin(yaw) * cp;
@@ -194,7 +189,6 @@
     },
 
     update: function (dt) {
-      // look
       if (!GC.game || GC.game.state === 'playing') {
         camYaw -= pointer.dx * 0.0026;
         camPitch += pointer.dy * 0.0022;
@@ -204,7 +198,6 @@
 
       var active = P.canMove && !P.frozen && GC.game && GC.game.state === 'playing';
 
-      // desired direction in camera space
       var ix = 0, iz = 0;
       if (active) {
         if (keys['KeyW'] || keys['ArrowUp']) iz -= 1;
@@ -221,7 +214,6 @@
       if (len > 0) {
         ix /= len; iz /= len;
         var cy = Math.cos(camYaw), sy = Math.sin(camYaw);
-        // camera forward on the XZ plane
         wishX = ix * cy + iz * sy;
         wishZ = -ix * sy + iz * cy;
       }
@@ -238,7 +230,6 @@
         P.vel.z *= Math.max(0, 1 - 9 * dt);
       }
 
-      // move + collide
       P.pos.x += P.vel.x * dt;
       resolveAxis('x');
       P.pos.z += P.vel.z * dt;
@@ -252,7 +243,6 @@
 
       P.speed = Math.sqrt(P.vel.x * P.vel.x + P.vel.z * P.vel.z);
 
-      // wobble: sprinting with 3 boxes shakes the stack
       var carried = 0;
       for (var s = 0; s < pizzaStack.length; s++) if (pizzaStack[s].visible) carried++;
       if (sprinting && carried >= 2) P.wobble += dt * 0.55;
@@ -262,7 +252,6 @@
         GC.game.onWobble && GC.game.onWobble();
       }
 
-      // character facing + animation
       if (person) {
         person.position.set(P.pos.x, 0, P.pos.z);
         var targetYaw = P.yaw;
@@ -294,14 +283,11 @@
         u.body.rotation.x = wob * 0.12;
         person.rotation.y = P.yaw;
 
-        // pizza stack rides on the chest
         for (var i = 0; i < pizzaStack.length; i++) {
           pizzaStack[i].rotation.z = Math.sin(ph * 0.8 + i) * (0.04 + wob * 0.5);
           pizzaStack[i].position.x = Math.sin(ph * 0.5 + i) * (0.03 + wob * 0.25);
         }
       }
-
-      // footsteps
       if (P.speed > 1.2 && active) {
         stepTimer -= dt * P.speed;
         if (stepTimer <= 0) {
@@ -310,7 +296,6 @@
         }
       }
 
-      // camera
       var cam = GC.camera;
       if (cam) {
         var dist = camDist;
